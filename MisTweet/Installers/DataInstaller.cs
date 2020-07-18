@@ -17,7 +17,7 @@ namespace MisTweet.Installers
             services.AddDbContextPool<MisTweetsDbContext>(
                 options => options.UseSqlServer(configuration.GetConnectionString("MisTweetsDBConnection")));
 
-            services.AddScoped<IPostService, PostSqlService>();
+            //services.AddScoped<IPostService, PostSqlService>();
         }
     }
 }

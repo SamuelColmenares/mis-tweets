@@ -1,31 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MisTweet.Contracts.V1;
-using MisTweet.Contracts.V1.Requests;
-using MisTweet.Contracts.V1.Responses;
-using MisTweet.Models;
-using MisTweet.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks;
 
 namespace MisTweet.Controllers.V1
 {
+    using MisTweet.Contracts.V1.Responses;
+    using MisTweet.Data.EfCore;
+    using MisTweet.Models;
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using MisTweet.Contracts.V1.Requests;
+
     public class PostController : Controller
     {
 
-        private readonly IPostService _postService;
+        private readonly PostRepository _postRepository;
 
-        public PostController(IPostService postService)
+        public PostController(PostRepository postRepository)
         {
-            _postService = postService;
+            _postRepository = postRepository;
         }
 
         [HttpGet(ApiRoutes.Posts.GetAll)]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var posts = from post in _postService.GetAll()
+            var posts = from post in await _postRepository.GetAll()
                         select new PostResponse
                         {
                             Id = post.Id,
@@ -36,9 +35,9 @@ namespace MisTweet.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Posts.Get)]
-        public IActionResult Get([FromRoute] Guid postId)
+        public async Task<IActionResult> Get([FromRoute] Guid postId)
         {
-            var post = _postService.GetById(postId);
+            var post = await _postRepository.Get(postId);
 
             if (post == null) return NotFound();
 
@@ -50,19 +49,19 @@ namespace MisTweet.Controllers.V1
         }
 
         [HttpPost(ApiRoutes.Posts.Create)]
-        public IActionResult Create([FromBody] CreatePostRequest postRequest)
+        public async Task<IActionResult> Create([FromBody] CreatePostRequest postRequest)
         {
             var newPost = new Post { Name = postRequest.Name };
 
             newPost.Id = Guid.NewGuid();
-            bool result = _postService.Create(newPost);
+            Post result = await _postRepository.Add(newPost);
 
-            if (!result) return BadRequest();
+            if (result == null) return BadRequest();
 
             var response = new PostResponse
             {
-                Id = newPost.Id,
-                Name = newPost.Name
+                Id = result.Id,
+                Name = result.Name
             };
 
             string urlBase = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
@@ -71,7 +70,7 @@ namespace MisTweet.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Posts.Update)]
-        public IActionResult Update([FromRoute] Guid postId, [FromBody] UpdatePostRequest postRequest)
+        public async Task<IActionResult> Update([FromRoute] Guid postId, [FromBody] UpdatePostRequest postRequest)
         {
             var post = new Post
             {
@@ -79,9 +78,9 @@ namespace MisTweet.Controllers.V1
                 Name = postRequest.Name
             };
 
-            var postUpdated = _postService.Update(post, postId);
+            var postUpdated = await _postRepository.Update(post);
 
-            if (postUpdated) return Ok(post);
+            if (postUpdated != null) return Ok(post);
             return BadRequest();
         }
     }
