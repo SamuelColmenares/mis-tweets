@@ -3,13 +3,14 @@
 namespace MisTweet.Data.EfCore
 {
     using Microsoft.EntityFrameworkCore;
+    using MisTweet.Models;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
     public abstract class EfCoreRepository<TEntity, TContext> : IRepository<TEntity>
-        where TEntity : class
+        where TEntity : class, IEntity
         where TContext : DbContext
     {
         private readonly TContext _context;

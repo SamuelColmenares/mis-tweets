@@ -48,6 +48,7 @@ namespace MisTweet
                 option.SwaggerEndpoint(swaggerOptions.UIEndpoint, swaggerOptions.Description);
             });
 
+            app.UseCors(options => options.AllowAnyOrigin());
             app.UseHttpsRedirection();
 
             app.UseRouting();

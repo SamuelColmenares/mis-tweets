@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace MisTweet.Models
 {
-    public class Post: IEntity
+    public interface IEntity
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
+        Guid Id { get; set; }
     }
 }
