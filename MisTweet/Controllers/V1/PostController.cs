@@ -10,7 +10,11 @@ namespace MisTweet.Controllers.V1
     using System.Linq;
     using System.Threading.Tasks;
     using MisTweet.Contracts.V1.Requests;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using MisTweet.Extensions;
 
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PostController : Controller
     {
 
@@ -21,6 +25,10 @@ namespace MisTweet.Controllers.V1
             _postRepository = postRepository;
         }
 
+        /// <summary>
+        /// Info del Action.
+        /// </summary>
+        /// <returns>Todos los datos</returns>
         [HttpGet(ApiRoutes.Posts.GetAll)]
         public async Task<IActionResult> GetAll()
         {
@@ -51,7 +59,11 @@ namespace MisTweet.Controllers.V1
         [HttpPost(ApiRoutes.Posts.Create)]
         public async Task<IActionResult> Create([FromBody] CreatePostRequest postRequest)
         {
-            var newPost = new Post { Name = postRequest.Name };
+            var newPost = new Post
+            {
+                Name = postRequest.Name,
+                UserId = HttpContext.GetUserId()
+            };
 
             newPost.Id = Guid.NewGuid();
             Post result = await _postRepository.Add(newPost);
@@ -72,11 +84,15 @@ namespace MisTweet.Controllers.V1
         [HttpPut(ApiRoutes.Posts.Update)]
         public async Task<IActionResult> Update([FromRoute] Guid postId, [FromBody] UpdatePostRequest postRequest)
         {
-            var post = new Post
+            var userOwnsPost = await _postRepository.UserOwnsPostAsync(postId, HttpContext.GetUserId());
+
+            if (!userOwnsPost)
             {
-                Id = postId,
-                Name = postRequest.Name
-            };
+                return BadRequest(new { error = "You dont own this post." });
+            }
+
+            var post = await _postRepository.Get(postId);
+            post.Name = postRequest.Name;            
 
             var postUpdated = await _postRepository.Update(post);
 

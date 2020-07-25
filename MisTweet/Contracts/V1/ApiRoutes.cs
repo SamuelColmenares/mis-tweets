@@ -15,5 +15,11 @@ namespace MisTweet.Contracts.V1
             public const string Get = Base + "/posts/{postId}";
             public const string Update = Base + "/posts/{postId}";
         }
+
+        public class Identity
+        {
+            public const string Register = Base + "/identity/register";
+            public const string Login = Base + "/identity/login";
+        }
     }
 }

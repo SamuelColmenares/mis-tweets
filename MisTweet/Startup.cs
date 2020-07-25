@@ -37,7 +37,7 @@ namespace MisTweet
 
             var swaggerOptions = new SwaggerOptions();
             _config.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
-
+            
             app.UseSwagger(option =>
             {
                 option.RouteTemplate = swaggerOptions.JsonRoute;
@@ -52,6 +52,8 @@ namespace MisTweet
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MisTweet.Data;
@@ -16,6 +17,9 @@ namespace MisTweet.Installers
         {
             services.AddDbContextPool<MisTweetsDbContext>(
                 options => options.UseSqlServer(configuration.GetConnectionString("MisTweetsDBConnection")));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<MisTweetsDbContext>();
 
             //services.AddScoped<IPostService, PostSqlService>();
         }

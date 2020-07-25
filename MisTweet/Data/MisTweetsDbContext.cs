@@ -1,14 +1,11 @@
 ﻿
 namespace MisTweet.Data
 {
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using MisTweet.Models;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
-    public class MisTweetsDbContext : DbContext
+    public class MisTweetsDbContext : IdentityDbContext
     {
         public MisTweetsDbContext(DbContextOptions<MisTweetsDbContext> options)
             : base(options) {}
